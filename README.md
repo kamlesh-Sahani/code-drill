@@ -1,8 +1,13 @@
 # CodeDrill: Coding Interview Practice Platform 🚀
 
-![CodeQuest Banner](https://via.placeholder.com/1200x400/6D28D9/FFFFFF?text=CodeQuest%3A+Master+Your+Coding+Interview+Skills)
 
-**CodeQuest** is a dynamic and interactive platform designed to help you ace your coding interviews. Whether you're preparing for JavaScript, Python, or React interviews, CodeQuest provides a wide range of question types, including MCQs, fill-in-the-blanks, output-based questions, and true/false questions. Practice, learn, and track your progress—all in one place!
+
+![Screenshot from 2025-03-19 00-02-33](https://github.com/user-attachments/assets/24539414-db75-47c8-9624-fb2cb4bb6399)
+![Screenshot from 2025-03-19 00-02-47](https://github.com/user-attachments/assets/1bc8c7c6-42f3-4e6c-b600-2c2ed8d3bf09)
+
+
+
+**CodeDrll** is a dynamic and interactive platform designed to help you ace your coding interviews. Whether you're preparing for JavaScript, Python, or React interviews, CodeQuest provides a wide range of question types, including MCQs, fill-in-the-blanks, output-based questions, and true/false questions. Practice, learn, and track your progress—all in one place!
 
 ---
 
@@ -92,13 +97,6 @@
 
 ---
 
-## 📸 Screenshots
-
-| **Start Screen** | **Question Screen** | **Score Screen** |
-|------------------|---------------------|------------------|
-| ![Start Screen](https://via.placeholder.com/400x250/6D28D9/FFFFFF?text=Start+Practice) | ![Question Screen](https://via.placeholder.com/400x250/1E293B/FFFFFF?text=What+is+the+output+of+%602+%2B+%2222%22%60%3F) | ![Score Screen](https://via.placeholder.com/400x250/10B981/FFFFFF?text=Score%3A+2+%2F+3) |
-
----
 
 ## 🤝 Contributing
 
