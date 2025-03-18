@@ -1,103 +1,184 @@
-import Image from "next/image";
+'use client';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import run from '@/lib/gemini';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [questions, setQuestions] = useState<any>([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [score, setScore] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState<string>('JavaScript'); // Default topic
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  // Function to fetch questions from Gemini API
+  const fetchQuestions = async (topic:string) => {
+    setIsLoading(true);
+    try {
+      const prompt = `Generate 5 questions for the topic "${topic}" with the following types:
+      1. Multiple Choice Questions (MCQs)
+      2. Fill in the Blanks
+      3. Output-Based Questions
+      4. True/False Questions
+
+      Ensure the questions are suitable for an advanced level. Return the response as a JSON array in the following format:
+      [
+        {
+          "text": "Question text",
+          "type": "MCQ",
+          "options": [
+            { "text": "Option 1", "isCorrect": true },
+            { "text": "Option 2", "isCorrect": false },
+            { "text": "Option 3", "isCorrect": false },
+            { "text": "Option 4", "isCorrect": false }
+          ]
+        },
+        {
+          "text": "Question text",
+          "type": "Fill in the Blank",
+          "answer": "Correct answer"
+        },
+        {
+          "text": "Question text",
+          "type": "Output-Based",
+          "answer": "Expected output"
+        },
+        {
+          "text": "Question text",
+          "type": "True/False",
+          "answer": true
+        }
+      ]`;
+
+      const response = await run(prompt);
+
+      // Parse the response and format questions
+      const generatedQuestions = JSON.parse(response);
+      console.log(generatedQuestions, "Generated Questions");
+      setQuestions(generatedQuestions);
+    } catch (error:any) {
+      console.error('Error fetching questions:', error.message);
+      alert('Failed to fetch questions. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStart = () => {
+    fetchQuestions(selectedTopic);
+  };
+
+  const handleAnswer = (isCorrect:string | boolean) => {
+    if (isCorrect) setScore(score + 1);
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      alert(`Quiz finished! Your score is ${score + (isCorrect ? 1 : 0)}/${questions.length}`);
+    }
+  };
+
+
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Top Bar */}
+      <div className="bg-gray-800 p-4 flex justify-between items-center shadow-lg">
+        <h1 className="text-2xl font-bold text-purple-500">CodeDrill</h1>
+        <div className="flex items-center space-x-4">
+          <span className="text-emerald-400">Score: {score}</span>
+          <select
+            value={selectedTopic}
+            onChange={(e) => setSelectedTopic(e.target.value)}
+            className="bg-gray-700 text-white p-2 rounded"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <option value="JavaScript">JavaScript</option>
+            <option value="Python">Python</option>
+            <option value="React">React</option>
+          </select>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      {/* Main Content */}
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-4xl mx-auto p-8"
+      >
+        {questions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-[70vh]">
+            <button
+              onClick={handleStart}
+              disabled={isLoading}
+              className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+            >
+              {isLoading ? 'Loading...' : 'Start Practice'}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="w-full bg-gray-800 rounded-full h-2.5 mb-8">
+              <div
+                className="bg-purple-500 h-2.5 rounded-full"
+                style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
+              ></div>
+            </div>
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+              <h2 className="text-xl font-semibold mb-4">{questions[currentQuestion].text}</h2>
+              {questions[currentQuestion].type === 'MCQ' && (
+                <div className="space-y-4">
+                  {questions[currentQuestion].options.map((option:any, index:number) => (
+                    <button
+                      key={index}
+                      onClick={() => handleAnswer(option.isCorrect)}
+                      className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-all duration-200"
+                    >
+                      {option.text}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {questions[currentQuestion].type === 'Fill in the Blank' && (
+                <input
+                  type="text"
+                  placeholder="Your answer"
+                  className="w-full bg-gray-700 text-white p-2 rounded"
+                  onBlur={(e:any) => handleAnswer(e.target.value === questions[currentQuestion].answer)}
+                />
+              )}
+              {questions[currentQuestion].type === 'Output-Based' && (
+                <div>
+                  <textarea
+                    placeholder="Write your code here"
+                    className="w-full bg-gray-700 text-white p-2 rounded"
+                  />
+                  <button
+                    onClick={() => handleAnswer(true)} // Replace with actual evaluation logic
+                    className="mt-2 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Submit
+                  </button>
+                </div>
+              )}
+              {questions[currentQuestion].type === 'True/False' && (
+                <div className="space-y-4">
+                  <button
+                    onClick={() => handleAnswer(questions[currentQuestion].answer === true)}
+                    className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-all duration-200"
+                  >
+                    True
+                  </button>
+                  <button
+                    onClick={() => handleAnswer(questions[currentQuestion].answer === false)}
+                    className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-all duration-200"
+                  >
+                    False
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </motion.div>
     </div>
   );
 }
